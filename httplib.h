@@ -591,6 +591,8 @@ struct Response {
   std::string body;
   std::string location; // Redirect location
 
+  Stream *stm;
+
   bool has_header(const std::string &key) const;
   std::string get_header_value(const std::string &key, size_t id = 0) const;
   uint64_t get_header_value_u64(const std::string &key, size_t id = 0) const;
@@ -6448,6 +6450,8 @@ inline bool Server::routing(Request &req, Response &res, Stream &strm) {
     // Read content into `req.body`
     if (!read_content(strm, req, res)) { return false; }
   }
+
+  res.stm = &strm;
 
   // Regular handler
   if (req.method == "GET" || req.method == "HEAD") {

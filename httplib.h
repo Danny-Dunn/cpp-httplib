@@ -583,6 +583,25 @@ struct Request {
   size_t authorization_count_ = 0;
 };
 
+class Stream {
+public:
+  virtual ~Stream() = default;
+
+  virtual bool is_readable() const = 0;
+  virtual bool is_writable() const = 0;
+
+  virtual ssize_t read(char *ptr, size_t size) = 0;
+  virtual ssize_t write(const char *ptr, size_t size) = 0;
+  virtual void get_remote_ip_and_port(std::string &ip, int &port) const = 0;
+  virtual void get_local_ip_and_port(std::string &ip, int &port) const = 0;
+  virtual socket_t socket() const = 0;
+
+  template <typename... Args>
+  ssize_t write_format(const char *fmt, const Args &...args);
+  ssize_t write(const char *ptr);
+  ssize_t write(const std::string &s);
+};
+
 struct Response {
   std::string version;
   int status = -1;
@@ -633,25 +652,6 @@ struct Response {
   ContentProviderResourceReleaser content_provider_resource_releaser_;
   bool is_chunked_content_provider_ = false;
   bool content_provider_success_ = false;
-};
-
-class Stream {
-public:
-  virtual ~Stream() = default;
-
-  virtual bool is_readable() const = 0;
-  virtual bool is_writable() const = 0;
-
-  virtual ssize_t read(char *ptr, size_t size) = 0;
-  virtual ssize_t write(const char *ptr, size_t size) = 0;
-  virtual void get_remote_ip_and_port(std::string &ip, int &port) const = 0;
-  virtual void get_local_ip_and_port(std::string &ip, int &port) const = 0;
-  virtual socket_t socket() const = 0;
-
-  template <typename... Args>
-  ssize_t write_format(const char *fmt, const Args &...args);
-  ssize_t write(const char *ptr);
-  ssize_t write(const std::string &s);
 };
 
 class TaskQueue {
